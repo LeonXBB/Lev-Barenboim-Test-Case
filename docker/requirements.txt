@@ -1,0 +1,14 @@
+# This file may be used to create an environment using:
+# $ conda create --name <env> --file <this file>
+# platform: win-64
+anyio
+fastapi
+pydantic
+starlette
+uvicorn
+python-decouple
+sqlalchemy
+asyncpg
+psycopg2-binary
+python-multipart
+ormar

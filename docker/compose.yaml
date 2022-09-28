@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+
+  db:
+    image: postgres
+    #restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_DB: default_database
+    ports:
+      - 55432:5432/tcp
+    env_file: secret.env # let's assume that it's secret
+    volumes:
+      - ./db/:/var/lib/postgres/data/
+    healthcheck:
+      test: "exit 0"
+
+  web:
+    env_file:
+      - .env
+    build:
+      context: ..
+      dockerfile: "docker/Dockerfile"
+      args:
+        - PORT=${PORT}
+        - HOST=${HOST}
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - storage:/storage
+    #restart: always
+
+volumes: 
+  db:
+  storage:

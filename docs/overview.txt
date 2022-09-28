@@ -1,0 +1,121 @@
+TABLE OF CONTENTS
+
+1. TASK (AS COPIED)
+2. DOCUMENTATION
+3. PROJECT OVERVIEW
+ 3.1 GENERAL INFORMATION
+ 3.2 LAUNCH METHOD
+ 3.3 FOLDER STRUCTURE
+  3.3.1 ROOT
+  3.3.2 DOCKER
+  3.3.3 STORAGE
+  3.3.4 DOCS
+  3.3.5 TESTING
+  3.3.6 APP
+  3.3.6.1 ENDPOINTS
+  3.3.6.2 MIDDLEWARE
+  3.3.6.3 DB
+  3.3.6.4 UTILS
+4. NEXT STEPS
+
+1. TASK (AS COPIED)
+
+Тестовое задание: API Файлового хранилища
+
+Фреймворк: Любой (не Django)
+
+Версия Python 3.9
+
+Задача: Реализовать эндпоинты (POST /files и GET /files/{id}, HEAD /files/{id}) для загрузки(на диск) и скачивания файлов, получения информации про файл (без скачивания), должна быть возможность сохранять и скачивать файлы с кириллическими именами
+пример: Звiт.txt.
+
+2. DOCUMENTATION
+
+Swagger API schemes and requests methods descriptions are accessible at: *host*/docs or *host*/redocs. I mean, why copy?
+
+3. PROJECT OVERVIEW
+3.1 GENERAL INFORMARION
+
+So, the task specified I'm not allowed to use Django for whatever reason. Therefore, I have decided to use FastAPI. I didn't know this framework before, but I was really missing it in my current job (as well as some other job postings), so I decided to get some practice, instead of pet projects. (I know this is a test task, I'm not going to publish it or anything). This is my first FastAPI project, I was learning on the go.
+
+We use Postgres DB for logging and saving information about files, this is file API, aftel all.
+I'm also using Docker-compose here, so you don't have any problems launhcing it on your machine.
+
+3.2 LAUNCH METHOD 
+
+cd docker
+docker-compose up (--build)
+
+That's all :-)
+
+3.3 FOLDER STRUCTURE
+3.3.1 ROOT
+
+That's the folder where the main file is, which is like the wrapper for the app endpoints and middleware; it gets executed by docker.
+
+3.3.2 DOCKER
+
+That's the folder where Docker metafiles are, like DockerFile and docker-compose.yaml. 
+It also has .env and secret.env files. We can set host and port for this app dynamically (.env), as well as database password (secret.env)
+
+3.3.3 STORAGE
+
+This is a docker volume where files are stored in the container.
+
+3.3.4 DOCS
+
+This is where this file is :-)
+
+3.3.5 TESTING
+
+Please, look chapter 4!
+
+3.3.6 APP
+
+This is "main" folder, where the principal code is. I moved it from root.main.py and orginised logically for better structure.
+
+Like Docker, it also has ".env" and "secret.env" files. We can set the max length for our filenames and check which of the middleware we want to run (.env), as well as
+set the token for authorization check (optional) and urls where authorization is to be ignored (secret.env)
+
+3.3.6.1 ENDPOINTS
+
+This is pathes of our FastAPI app. They contain the code that is going to be run on receiving request. The idea of removing is from main is, like I said before, better structuring, as well as separation of concepts and allowing for re-use of the code (from another API, for example). 
+The code automatically checks for all types of exceptions that I could think of.
+
+3.3.6.2 MIDDLEWARE
+
+Alright, so the task didn't specify any middleware but I decided to <strike>show_off</strike> implement what any serious server should have, in my opinion, i.e authorization check and logging. Specifically, 
+
+-authorization_check checks for body form attr "auth_token" and checks if its sha256 form is equal to sha256 form of REQUESTS_TOKEN in app.secret.env. It's meant as a mock, obviously.
+-logging logs each request: id, ip, method and epoch. Obviously, that's enough for the demonstration. 
+
+Both middlewares are turnable off in the app..env.
+
+Please, note, that because of some limitations on accessing request body in FastAPI (as explained in root.main.py), the middleware functions are not actually middleware as in FastAPI decorators, but rather separate functions that are declared as dependencies by APIRouter.  
+
+3.3.6.3 DB
+
+The folder, that contains code for the initalization of the database, as well as models classes. 
+I'm using ormar framework as an ORM for SQLAlchemy.
+
+3.3.6.4 UTILS 
+
+Thus is a folder to put all the function that I use in different places, in one place. Getting environment, hash representation of a string, and file path.
+
+4. NEXT STEPS
+
+Alright, so I asked you to look here for testing... Well, because of some limitations, related to the suddenly-appearing tasks at my current job, me, having already asked HR-person to move deadline once, I...didn't write tests :-( Well, I checked manually and everything seemed to work. Haha, famous last words...
+
+I know you can count it as a mistake, I'm supposed to manage my own time, and you would be right but I hope you won't. I mean, if you get interested in my perfomance and would like me to finish, please contact me, and I will find time to write them, both e2e and unit, I promise!
+
+The actual steps that I would do if I were to continue are:
+1. Write tests!
+2. Write documentation instead of this.
+2.5 Added more comments in the code generally. 
+3. Finish all TODOs in code (there's quite a few)
+4. Populate .gitignore and .dockerignore - we definetely do not need secrets, docker metafiles, db-related things etc. 
+5. Added some kind of "manager" object for the middleware methods to control them better.
+6. Think about adding celery and rabitmq to the project to allow for multithreading proccessing of requests at the same time.
+
+
+That's about it! Thank you for your attention!
